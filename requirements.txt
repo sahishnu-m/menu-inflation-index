@@ -1,0 +1,37 @@
+# Streamlit is PINNED rather than given a floor.
+#
+# Streamlit Cloud serves its JavaScript in content-hashed chunks that the page
+# loads lazily, so a chart pulls its code only when first drawn. Those
+# filenames change with every release. Under a ">=" constraint a rebuild could
+# install a newer Streamlit, leaving any browser still holding the previous
+# page asking for chunks that no longer exist, which appears as "Failed to
+# fetch dynamically imported module" where a chart should be. Pinning makes a
+# rebuild of unchanged code produce identical assets.
+streamlit==1.64.0
+
+pandas>=2.2
+requests>=2.32
+
+# Altair draws every chart. Streamlit renders it natively and applies the
+# theme from .streamlit/config.toml, so charts inherit the page palette and
+# fonts without being styled separately.
+altair>=5.4
+
+# BeautifulSoup parses menu HTML; lxml is the parser it uses underneath.
+# lxml is faster than Python's built-in parser and copes far better with the
+# broken markup that restaurant websites tend to produce.
+beautifulsoup4>=4.12
+lxml>=5.2
+
+# PyYAML reads config/restaurants.yaml and config/settings.yaml.
+PyYAML>=6.0
+
+# SQLite arrives with Python, so the database needs no entry here.
+#
+# Playwright is deliberately absent. It is needed only for restaurants whose
+# menus are built by JavaScript, it downloads a full browser (~150 MB), and
+# Streamlit Community Cloud has no use for it since the dashboard reads the
+# database and never scrapes. Install it locally when you need it:
+#
+#     pip install playwright
+#     python -m playwright install chromium

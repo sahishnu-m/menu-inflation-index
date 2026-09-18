@@ -1,0 +1,129 @@
+# ============================================================================
+# settings.yaml - every tunable number outside of the restaurant list.
+#
+# Kept apart from restaurants.yaml because the two change for different
+# reasons and at different rates. You will edit restaurants.yaml often, as
+# menus move and selectors break. You will edit this file rarely, when you
+# want to change how the index itself is calculated.
+# ============================================================================
+
+# ----------------------------------------------------------------------------
+# SCRAPING
+# ----------------------------------------------------------------------------
+# These settings exist to keep the scraper well behaved. The code applies them
+# inside the fetch function itself, so no future edit can accidentally skip
+# them by forgetting to call something.
+scraping:
+  # Seconds to wait between requests to the SAME host. The brief asked for
+  # 2-3 seconds; 3.0 is the slow end of that range, chosen because being
+  # slower than required costs this project nothing and costs the restaurant
+  # even less.
+  rate_limit_seconds: 3.0
+
+  # The User-Agent sent with every request. It says plainly what this is and
+  # where to find it, so any restaurant seeing this traffic in their logs can
+  # identify it and get in touch. Change the URL if you fork the project.
+  user_agent: >-
+    menu-inflation-index/1.0 (high-school economics project; contact via
+    https://github.com/sahishnu-m/menu-inflation-index)
+
+  request_timeout_seconds: 25
+
+  # Seconds to let a JavaScript page settle before reading it. Pages that
+  # build their menu in the browser need a moment after load.
+  javascript_settle_seconds: 4.0
+
+  # How long a cached copy of a page stays usable, in hours. Re-running the
+  # scraper inside this window reads from disk and sends no request at all.
+  # 20 hours means a same-day re-run is free while a next-day run is fresh.
+  cache_hours: 20
+
+  # Refuse to fetch when robots.txt cannot be read. See scraper.py for the
+  # reasoning. Leaving this true is the whole ethical posture of the project.
+  fail_closed_on_unreadable_robots: true
+
+# ----------------------------------------------------------------------------
+# PRICE PARSING
+# ----------------------------------------------------------------------------
+prices:
+  # Prices outside this range are discarded as parsing mistakes. A menu page
+  # holds phone numbers, addresses, calorie counts and years, and a naive
+  # "find a number" would happily read 2026 as a price.
+  min_dollars: 0.75
+  max_dollars: 250.00
+
+  # Two items count as the same item when their cleaned names are at least
+  # this similar, from 0 to 1. See normalize.py for how the comparison works.
+  #
+  # TUNING: too low and "Cheeseburger" merges with "Double Cheeseburger",
+  # inventing a price jump out of nothing. Too high and a menu fixing a typo
+  # starts a brand new series, breaking the history. 0.88 errs toward keeping
+  # them separate, because a false split is visible in the data while a false
+  # merge quietly corrupts the index.
+  match_threshold: 0.88
+
+# ----------------------------------------------------------------------------
+# THE INDEX
+# ----------------------------------------------------------------------------
+index:
+  # The index equals 100 in the base period, and every later period is read
+  # against it. A value of 112.5 means the basket costs 12.5% more than it did
+  # in the base period.
+  base_value: 100.0
+
+  # An item must appear in at least this many periods to enter the basket.
+  # Items seen once carry no information about price CHANGE, which is the only
+  # thing this project measures.
+  min_periods_per_item: 2
+
+  # A restaurant needs at least this many basket items before its prices count
+  # toward a category index. One item from a restaurant is noise.
+  min_items_per_restaurant: 3
+
+  # Month-over-month moves larger than this are flagged for review and left
+  # out of the index. A 400% jump is nearly always a parsing error or a
+  # renamed item that got merged by mistake, and letting one through would
+  # swamp every genuine price move around it.
+  max_monthly_change_pct: 60.0
+
+# ----------------------------------------------------------------------------
+# BLS COMPARISON SERIES
+# ----------------------------------------------------------------------------
+bls:
+  # CUUR0000SEFV is "Food away from home", US city average, all urban
+  # consumers, not seasonally adjusted. That is the official measure of
+  # restaurant prices, and the closest national counterpart to what this
+  # project measures locally.
+  series_id: CUUR0000SEFV
+  series_name: "CPI: Food away from home (US city average)"
+
+  # The public v2 endpoint answers without a registration key, with a daily
+  # request cap. Responses are cached on disk, so a normal day makes one call.
+  api_url: "https://api.bls.gov/publicAPI/v2/timeseries/data/"
+  cache_hours: 24
+
+  # A registration key raises the daily cap and allows longer date ranges.
+  # It is optional. Set the BLS_API_KEY environment variable to use one;
+  # the code sends it only when it is present.
+  #
+  # Never write a key into this file. This file is committed to git, and
+  # anything committed to a public repository is public permanently, even
+  # after a later commit removes it.
+
+# ----------------------------------------------------------------------------
+# DATA SEPARATION
+# ----------------------------------------------------------------------------
+# The single most important rule in this project.
+#
+# Every price row carries a `dataset` value of either "real" or "simulated".
+# Simulated rows come from scripts/seed_demo_data.py and exist so the
+# dashboard has something to display before months of real collection have
+# happened. Real rows come from actual scrapes.
+#
+# The two are never averaged, never summed, and never charted on one line.
+# Every query filters on `dataset`, and the dashboard shows a standing notice
+# whenever it is displaying simulated numbers. A price index built partly from
+# invented data would be worthless and, shown without that notice, dishonest.
+data:
+  default_dataset: simulated   # switched to "real" once you have two real months
+  simulated_label: "SIMULATED DEMO DATA"

@@ -1,0 +1,36 @@
+# Look and feel of the Streamlit app.
+# Shared with the other projects in this portfolio so they read as one body
+# of work.
+[theme]
+base = "light"
+primaryColor = "#2a78d6"
+backgroundColor = "#fcfcfb"
+secondaryBackgroundColor = "#f3f2ee"
+textColor = "#0b0b0b"
+borderColor = "#e6e5e0"
+baseRadius = "8px"
+showWidgetBorder = true
+
+# Typography: a plain neutral grotesque for headings and body alike.
+#
+# Streamlit's built-in "sans-serif" alias resolves to Source Sans, a humanist
+# face with soft, rounded letterforms that reads as friendly. Wrong register
+# for a page of price statistics, so both fonts are named explicitly.
+#
+# These are font STACKS, and the order matters. The browser walks the list and
+# uses the first one installed: Helvetica Neue on macOS, Arial on Windows,
+# then Liberation Sans or Nimbus Sans on Linux, which is what Streamlit
+# Community Cloud runs. Every entry is metrically compatible with the others,
+# so the layout holds whichever one a visitor ends up with.
+#
+# Nothing is downloaded from a font CDN, which keeps the page fast and removes
+# a third-party request.
+font = "Helvetica Neue, Helvetica, Arial, Liberation Sans, Nimbus Sans, sans-serif"
+headingFont = "Helvetica Neue, Helvetica, Arial, Liberation Sans, Nimbus Sans, sans-serif"
+codeFont = "SFMono-Regular, Menlo, Consolas, Liberation Mono, monospace"
+
+# Blue for this project's index, orange for the CPI comparison, green spare.
+chartCategoricalColors = ["#2a78d6", "#eb6834", "#1baf7a"]
+
+[browser]
+gatherUsageStats = false

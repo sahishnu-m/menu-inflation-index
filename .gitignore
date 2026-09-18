@@ -1,0 +1,63 @@
+# --- Scraped pages -----------------------------------------------------------
+# Raw menu HTML stays OFF the repository, deliberately.
+#
+# Two reasons. A restaurant's page is their content, and republishing whole
+# copies of it goes well beyond what this project needs. And the pages are
+# large, change constantly, and would bloat the history for no benefit, since
+# what the project is actually about is item names and prices.
+#
+# The database keeps the aggregate. The cache is a local speed-up that any
+# clone regenerates by running the scraper.
+data/cache/
+
+# --- Local report files ------------------------------------------------------
+data/robots_report.json
+
+# --- The database ------------------------------------------------------------
+# COMMENTED OUT ON PURPOSE.
+#
+# data/menu_prices.sqlite is committed, because Streamlit Community Cloud
+# deploys straight from this repository and has no other way to reach the
+# data. It holds item names and prices only: no page content, no personal
+# data, nothing identifying.
+#
+# Uncomment the next line if the file ever grows past roughly 50 MB, and move
+# to a hosted database at that point.
+# data/*.sqlite
+
+# --- Python ------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# --- Virtual environments ----------------------------------------------------
+.venv/
+venv/
+env/
+ENV/
+
+# --- Testing and tooling -----------------------------------------------------
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# --- Streamlit ---------------------------------------------------------------
+# secrets.toml can hold API keys. This project needs none, since the BLS
+# endpoint answers without one, and the ignore stays so a future key cannot be
+# committed by accident.
+.streamlit/secrets.toml
+
+# --- Editors and OS ----------------------------------------------------------
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+desktop.ini

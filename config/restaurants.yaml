@@ -1,0 +1,288 @@
+# ============================================================================
+# restaurants.yaml - every restaurant the scraper knows about.
+#
+# THIS FILE IS MEANT TO BE EDITED BY YOU. The code reads it at startup, so
+# adding a restaurant is a change here and nothing else. No Python involved.
+#
+# HOW MUCH TO TRUST WHAT IS BELOW
+# The names and categories are real Reno-area restaurants. The URLs are a
+# best guess at each one's menu page, and the CSS selectors are placeholders
+# that have NOT been checked against the live pages. Every entry therefore
+# carries `verified: false`.
+#
+# That flag is honest bookkeeping. A selector that matches nothing produces
+# zero items, and a scraper that silently collects zero items looks exactly
+# like a restaurant that removed its menu. The scraper reports the difference,
+# and the dashboard shows which restaurants are still unverified.
+#
+# HOW TO VERIFY ONE (about five minutes per restaurant)
+#   1. Open the menu page in Chrome or Firefox.
+#   2. Right-click a menu item's name, choose Inspect.
+#   3. Look at the highlighted element and its parents. Find the repeating
+#      block that wraps ONE item, with its name and price inside.
+#   4. Put that block's selector in `item`, and the name and price selectors
+#      in `name` and `price`. They are searched INSIDE each `item` block.
+#   5. Run: python scripts/run_scrape.py --only <id> --dry-run
+#      It prints what it found without writing to the database.
+#   6. Once the output looks right, set `verified: true`.
+#
+# A NOTE ON WHY SELECTORS BELONG IN CONFIG
+# Restaurant sites get redesigned constantly, which breaks selectors. Keeping
+# them here means a break is fixed by editing one line of text. Had they been
+# written into Python, every redesign would mean editing code, and the code
+# would slowly fill up with one special case per restaurant.
+# ============================================================================
+
+meta:
+  region: Reno / Sparks, Nevada
+  # Categories used for the per-category indices. Keep these three stable;
+  # the dashboard and the index code both group by them.
+  categories:
+    fast_food: "Counter service, national or regional chains"
+    casual: "Sit-down neighbourhood restaurants, pub food, diners"
+    mid_range: "Full service, higher price point, chef-driven menus"
+
+restaurants:
+
+  # ---------------------------------------------------------------------
+  # FAST FOOD
+  # Chains are included deliberately. Their prices move for corporate
+  # reasons that apply nationally, which makes them a useful contrast with
+  # the local restaurants whose prices move for local reasons.
+  # ---------------------------------------------------------------------
+
+  - id: mcdonalds_reno
+    name: "McDonald's"
+    category: fast_food
+    url: "https://www.mcdonalds.com/us/en-us/full-menu.html"
+    renderer: javascript      # menu is built client-side
+    verified: false
+    selectors:
+      item: "[data-testid='product-card']"
+      name: ".cmp-category__item-name"
+      price: ".cmp-category__item-price"
+    notes: >
+      National chain. Prices vary by franchise, so whatever this returns is a
+      national or regional figure rather than the Reno store's board price.
+
+  - id: taco_bell
+    name: "Taco Bell"
+    category: fast_food
+    url: "https://www.tacobell.com/food"
+    renderer: javascript
+    verified: false
+    selectors:
+      item: "[data-testid='product-tile']"
+      name: "h3"
+      price: "[data-testid='price']"
+
+  - id: chipotle
+    name: "Chipotle Mexican Grill"
+    category: fast_food
+    url: "https://www.chipotle.com/order/build/burrito"
+    renderer: javascript
+    verified: false
+    selectors:
+      item: "[data-qa-item-card]"
+      name: "[data-qa-item-name]"
+      price: "[data-qa-item-price]"
+
+  - id: in_n_out
+    name: "In-N-Out Burger"
+    category: fast_food
+    url: "https://www.in-n-out.com/menu"
+    renderer: static
+    verified: false
+    selectors:
+      item: ".menu-item"
+      name: ".menu-item-name"
+      price: ".menu-item-price"
+
+  - id: panda_express
+    name: "Panda Express"
+    category: fast_food
+    url: "https://www.pandaexpress.com/menu"
+    renderer: javascript
+    verified: false
+    selectors:
+      item: ".menu-item"
+      name: ".item-name"
+      price: ".item-price"
+
+  - id: port_of_subs
+    name: "Port of Subs"
+    category: fast_food
+    url: "https://portofsubs.com/menu/"
+    renderer: static
+    verified: false
+    selectors:
+      item: ".menu-item"
+      name: ".menu-item-title"
+      price: ".menu-item-price"
+    notes: "Founded in Reno in 1972, which makes it a local chain worth tracking."
+
+  - id: raising_canes
+    name: "Raising Cane's"
+    category: fast_food
+    url: "https://www.raisingcanes.com/menu/"
+    renderer: javascript
+    verified: false
+    selectors:
+      item: ".menu-item"
+      name: ".menu-item__name"
+      price: ".menu-item__price"
+
+  # ---------------------------------------------------------------------
+  # CASUAL
+  # ---------------------------------------------------------------------
+
+  - id: gold_n_silver
+    name: "Gold 'N Silver Inn"
+    category: casual
+    url: "https://goldnsilverinn.com/menu/"
+    renderer: static
+    verified: false
+    selectors:
+      item: ".menu-item"
+      name: ".menu-item-title"
+      price: ".menu-item-price"
+    notes: "Long-running 24-hour Reno diner."
+
+  - id: little_waldorf
+    name: "Little Waldorf Saloon"
+    category: casual
+    url: "https://thelittlewal.com/menu/"
+    renderer: static
+    verified: false
+    selectors:
+      item: ".menu-item"
+      name: "h4"
+      price: ".price"
+
+  - id: great_full_gardens
+    name: "Great Full Gardens"
+    category: casual
+    url: "https://greatfullgardens.com/menu/"
+    renderer: static
+    verified: false
+    selectors:
+      item: ".menu-item"
+      name: ".menu-item-name"
+      price: ".menu-item-price"
+
+  - id: laughing_planet
+    name: "Laughing Planet"
+    category: casual
+    url: "https://laughingplanet.com/menu/"
+    renderer: static
+    verified: false
+    selectors:
+      item: ".menu-item"
+      name: ".title"
+      price: ".price"
+
+  - id: inclined_burgers
+    name: "Inclined Burgers & Brews"
+    category: casual
+    url: "https://www.inclinedburgers.com/menu"
+    renderer: javascript
+    verified: false
+    selectors:
+      item: ".menu-item"
+      name: ".menu-item-title"
+      price: ".menu-item-price"
+
+  - id: twisted_fork
+    name: "The Twisted Fork"
+    category: casual
+    url: "https://twistedforkreno.com/menu/"
+    renderer: static
+    verified: false
+    selectors:
+      item: ".menu-item"
+      name: ".menu-item-title"
+      price: ".menu-item-price"
+
+  - id: washoe_public_house
+    name: "Washoe Public House"
+    category: casual
+    url: "https://washoepublichouse.com/menu/"
+    renderer: static
+    verified: false
+    selectors:
+      item: ".menu-item"
+      name: ".menu-item-title"
+      price: ".menu-item-price"
+
+  # ---------------------------------------------------------------------
+  # MID RANGE
+  # ---------------------------------------------------------------------
+
+  - id: wild_river_grille
+    name: "Wild River Grille"
+    category: mid_range
+    url: "https://wildrivergrille.com/menus/"
+    renderer: static
+    verified: false
+    selectors:
+      item: ".menu-item"
+      name: ".menu-item-title"
+      price: ".menu-item-price"
+
+  - id: louis_basque_corner
+    name: "Louis' Basque Corner"
+    category: mid_range
+    url: "https://louisbasquecorner.com/menu/"
+    renderer: static
+    verified: false
+    selectors:
+      item: ".menu-item"
+      name: ".menu-item-title"
+      price: ".menu-item-price"
+    notes: >
+      Basque family-style restaurant. Its set-price family dinner makes a
+      single clean series to follow over time.
+
+  - id: brasserie_saint_james
+    name: "Brasserie Saint James"
+    category: mid_range
+    url: "https://brasseriesaintjames.com/menu/"
+    renderer: static
+    verified: false
+    selectors:
+      item: ".menu-item"
+      name: ".menu-item-title"
+      price: ".menu-item-price"
+
+  - id: liberty_food_wine
+    name: "Liberty Food & Wine Exchange"
+    category: mid_range
+    url: "https://libertyfoodandwine.com/menu/"
+    renderer: static
+    verified: false
+    selectors:
+      item: ".menu-item"
+      name: ".menu-item-title"
+      price: ".menu-item-price"
+
+  - id: campo_reno
+    name: "Campo"
+    category: mid_range
+    url: "https://camporeno.com/menu/"
+    renderer: static
+    verified: false
+    selectors:
+      item: ".menu-item"
+      name: ".menu-item-title"
+      price: ".menu-item-price"
+
+  - id: pignic_pub
+    name: "Pignic Pub & Patio"
+    category: mid_range
+    url: "https://pignicpub.com/menu/"
+    renderer: static
+    verified: false
+    selectors:
+      item: ".menu-item"
+      name: ".menu-item-title"
+      price: ".menu-item-price"
