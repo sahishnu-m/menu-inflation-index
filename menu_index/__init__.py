@@ -12,7 +12,6 @@ question and can be read on its own:
     normalize.py  Is this the same item we saw last month under a new name?
     bls.py        What does the official CPI say?
     indexer.py    How do observations become an index number?
-    seed.py       Where does demo data come from before real data exists?
 
 The pipeline runs in that order: scrape, parse, normalize, store, index.
 """

@@ -378,9 +378,8 @@ def clear_dataset(dataset: str, db_path: Path | None = None) -> int:
     """
     Delete every observation in one dataset, and any item left with none.
 
-    Used by the seed script so that regenerating demo data replaces it instead
-    of stacking a second copy on top. Restricting it to a single dataset means
-    reseeding the demo data can never touch real observations.
+    Restricting it to a single dataset means clearing one can never touch
+    observations recorded under the other label.
     """
     with connect(db_path) as connection:
         cursor = connection.execute(

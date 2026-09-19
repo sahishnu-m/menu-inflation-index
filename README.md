@@ -33,7 +33,7 @@ python -m venv .venv
 
 pip install -r requirements.txt
 
-python scripts/seed_demo_data.py    # simulated data, so the charts have shape
+python scripts/run_scrape.py        # collect the current month's prices
 streamlit run app.py
 ```
 
@@ -139,16 +139,9 @@ The dashboard shows four things: the local index against the national CPI,
 each price tier's own index, the individual dishes that moved most, and the
 methodology with its limits.
 
-As of this writing, no months of real data have been collected yet, so the
-dashboard shows **simulated demo data**, labelled as such wherever it appears.
-A banner at the top of the app states this plainly, and states how many
-months of real data exist and when real collection began, both read from the
-database on every load rather than written into the app's code. Real and
-simulated observations are stored under separate labels in the same database
-and are never combined, never averaged, and never drawn on one line. Every
-database read takes a dataset argument, so the separation is enforced in the
-storage layer rather than left to each caller to remember. The dashboard
-switches to real data automatically once two or more months of it exist.
+The dashboard only ever shows real, scraped observations. Every database
+read takes a dataset argument naming which set it wants, so a future
+addition to the storage layer cannot silently blend in anything else.
 
 ---
 
@@ -307,10 +300,8 @@ menu-inflation-index/
 │   ├── normalize.py                renames, resizes, price parsing
 │   ├── indexer.py                  the Laspeyres index
 │   ├── bls.py                      the CPI comparison series
-│   ├── pipeline.py                 one full collection run
-│   └── seed.py                     simulated demo data
+│   └── pipeline.py                 one full collection run
 ├── scripts/
-│   ├── seed_demo_data.py
 │   ├── run_scrape.py
 │   ├── check_robots.py
 │   └── fetch_cpi.py
