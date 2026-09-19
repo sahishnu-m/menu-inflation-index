@@ -345,6 +345,7 @@ def dataset_summary(dataset: str, db_path: Path | None = None) -> dict:
                 COUNT(*)                       AS observations,
                 COUNT(DISTINCT o.item_id)      AS items,
                 COUNT(DISTINCT i.restaurant_id) AS restaurants,
+                COUNT(DISTINCT o.period)       AS periods,
                 MIN(o.period)                  AS first_period,
                 MAX(o.period)                  AS last_period
             FROM observations o

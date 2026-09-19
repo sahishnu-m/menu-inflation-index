@@ -82,10 +82,11 @@ Quantities come from the base period and stay there, so every movement in the
 number comes from prices. That is the family the CPI belongs to, which is what
 makes the comparison meaningful.
 
-This project has **no quantities** — nobody knows how many cheeseburgers Reno
-buys — so every basket item gets a quantity of 1, and the formula reduces to
-the sum of this month's basket prices over the sum of the same items' prices
-last month. The consequences of that simplification are in *Limitations*.
+This project has **no quantities**, since nobody knows how many cheeseburgers
+Reno buys, so every basket item gets a quantity of 1, and the formula reduces
+to the sum of this month's basket prices over the sum of the same items'
+prices last month. The consequences of that simplification are in
+*Limitations*.
 
 ### Matched items only
 
@@ -138,12 +139,16 @@ The dashboard shows four things: the local index against the national CPI,
 each price tier's own index, the individual dishes that moved most, and the
 methodology with its limits.
 
-Until real collection has run for a few months, it displays **simulated demo
-data**, labelled as such wherever it appears. Real and simulated observations
-are stored under separate labels in the same database and are never combined,
-never averaged, and never drawn on one line. Every database read takes a
-dataset argument, so the separation is enforced in the storage layer rather
-than left to each caller to remember.
+As of this writing, no months of real data have been collected yet, so the
+dashboard shows **simulated demo data**, labelled as such wherever it appears.
+A banner at the top of the app states this plainly, and states how many
+months of real data exist and when real collection began, both read from the
+database on every load rather than written into the app's code. Real and
+simulated observations are stored under separate labels in the same database
+and are never combined, never averaged, and never drawn on one line. Every
+database read takes a dataset argument, so the separation is enforced in the
+storage layer rather than left to each caller to remember. The dashboard
+switches to real data automatically once two or more months of it exist.
 
 ---
 
