@@ -218,10 +218,15 @@ differently, often by more.
 permit scraping. Whether that group's prices behave like the ones that block it
 is unknown.
 
-**Selectors are unverified.** Every entry in `config/restaurants.yaml` is
-currently `verified: false`, meaning nobody has checked its CSS selectors
-against the live page. A selector matching nothing looks exactly like a
-restaurant that removed its menu, so the scraper reports the difference and the
+**Most selectors are still unverified.** Only 3 of 20 entries in
+`config/restaurants.yaml` are currently `verified: true`. The rest either
+have not been checked against the live page yet, or were checked and found
+to need something this scraper cannot do today: a location picker before
+prices show, a PDF menu instead of HTML, a page that only loads its first
+section without a click, or a menu whose prices are not laid out in a way
+CSS selectors can isolate. Each of those entries carries a note explaining
+what was found. A selector matching nothing looks exactly like a restaurant
+that removed its menu, so the scraper reports the difference and the
 dashboard shows which are still unchecked.
 
 **The CPI comparison is context rather than a grade.** `CUUR0000SEFV` is a US

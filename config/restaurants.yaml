@@ -75,6 +75,12 @@ restaurants:
       item: "[data-testid='product-tile']"
       name: "h3"
       price: "[data-testid='price']"
+    notes: >
+      Checked live: the site refuses the connection outright at the network
+      level (an HTTP2 protocol error) for both this scraper's own browser
+      fetch and a plain Chromium instance, before any page content loads.
+      That looks like a block on the hosting or CDN layer rather than
+      anything selectors could fix.
 
   - id: chipotle
     name: "Chipotle Mexican Grill"
@@ -86,6 +92,12 @@ restaurants:
       item: "[data-qa-item-card]"
       name: "[data-qa-item-name]"
       price: "[data-qa-item-price]"
+    notes: >
+      Checked live: this URL is an order-builder that requires picking a
+      store location before it shows any items or prices, so there is
+      nothing here yet for a selector to match. Finding the right selectors
+      would first need a stored/selected Reno location, which this scraper
+      does not do.
 
   - id: in_n_out
     name: "In-N-Out Burger"
@@ -97,6 +109,12 @@ restaurants:
       item: ".menu-item"
       name: ".menu-item-name"
       price: ".menu-item-price"
+    notes: >
+      Checked live: robots.txt allows this scraper, but the site serves an
+      Incapsula bot-detection challenge page to it instead of the real menu.
+      That is a block enforced below the robots.txt layer, and per this
+      project's rule against evading blocks, it is left alone rather than
+      defeated.
 
   - id: panda_express
     name: "Panda Express"
@@ -113,13 +131,19 @@ restaurants:
     name: "Port of Subs"
     category: fast_food
     url: "https://portofsubs.com/menu/"
-    renderer: static
+    renderer: javascript
     verified: false
     selectors:
       item: ".menu-item"
       name: ".menu-item-title"
       price: ".menu-item-price"
-    notes: "Founded in Reno in 1972, which makes it a local chain worth tracking."
+    notes: >
+      Founded in Reno in 1972, which makes it a local chain worth tracking.
+      Checked live: the page loads an "Our Menu" section and an order-now
+      flow, but no prices appear even after a full browser render, which
+      points to prices living behind the ordering flow rather than on the
+      page itself. Set to javascript in case a future check finds them
+      loading later; nothing usable found yet.
 
   - id: raising_canes
     name: "Raising Cane's"
@@ -131,6 +155,11 @@ restaurants:
       item: ".menu-item"
       name: ".menu-item__name"
       price: ".menu-item__price"
+    notes: >
+      Checked live: the public menu page lists every item and its calories
+      but no price, for any item. Raising Cane's appears not to publish
+      prices without a selected store location, so there is nothing on this
+      page for a selector to find regardless of what it targets.
 
   # ---------------------------------------------------------------------
   # CASUAL
@@ -146,7 +175,12 @@ restaurants:
       item: ".menu-item"
       name: ".menu-item-title"
       price: ".menu-item-price"
-    notes: "Long-running 24-hour Reno diner."
+    notes: >
+      Long-running 24-hour Reno diner. Checked live: the whole domain,
+      including the homepage, now redirects to a domain-parking page, which
+      means the restaurant's website has lapsed rather than moved. No
+      selector fixes this; it would need a current URL for the business,
+      which has not been found.
 
   - id: little_waldorf
     name: "Little Waldorf Saloon"
@@ -163,23 +197,34 @@ restaurants:
     name: "Great Full Gardens"
     category: casual
     url: "https://greatfullgardens.com/menu/"
-    renderer: static
+    renderer: javascript
     verified: false
     selectors:
       item: ".menu-item"
       name: ".menu-item-name"
       price: ".menu-item-price"
+    notes: >
+      Checked live: the menu runs on Popmenu, the same system as Liberty
+      Food & Wine Exchange, and this restaurant's page did not finish
+      loading within a full browser render at all. Set to javascript since
+      the page needs one; still needs the same "Load More Content" handling
+      Liberty does before any items would appear.
 
   - id: laughing_planet
     name: "Laughing Planet"
     category: casual
     url: "https://laughingplanet.com/menu/"
     renderer: static
-    verified: false
+    verified: true
     selectors:
-      item: ".menu-item"
-      name: ".title"
-      price: ".price"
+      item: "section.menu-item"
+      name: "h3"
+      price: ".item-price"
+    notes: >
+      Verified against the live page: 50 items across the menu. Prices are
+      printed as bare numbers with no dollar sign ("3.75"), which the price
+      parser already handles when it comes through a real selector rather
+      than the generic fallback sweep.
 
   - id: inclined_burgers
     name: "Inclined Burgers & Brews"
@@ -195,13 +240,19 @@ restaurants:
   - id: twisted_fork
     name: "The Twisted Fork"
     category: casual
-    url: "https://twistedforkreno.com/menu/"
+    url: "https://www.twistedforkreno.com/food"
     renderer: static
     verified: false
     selectors:
       item: ".menu-item"
       name: ".menu-item-title"
       price: ".menu-item-price"
+    notes: >
+      The old /menu/ URL now 404s; the real page is /food, updated above.
+      Checked live: that page renders only its hours and location in plain
+      HTML, with no dish names or prices anywhere in the fetched markup, so
+      the actual menu content loads some other way this scraper has not
+      identified yet.
 
   - id: washoe_public_house
     name: "Washoe Public House"
@@ -213,6 +264,20 @@ restaurants:
       item: ".menu-item"
       name: ".menu-item-title"
       price: ".menu-item-price"
+    notes: >
+      This URL 404s, and that is left as is on purpose. The site's nav links
+      to "reno-washoe-public-house-food-menu" instead, which does parse
+      cleanly with item selectors .food-item-holder / .food-item-title /
+      .food-price (57 items), but that page turns out to be a private-event
+      catering menu priced per dozen ("$42.00" for a dozen tempura prawns,
+      for instance), not the regular a la carte menu this project compares
+      against other restaurants. This pipeline scrapes and stores data for
+      every configured restaurant regardless of `verified`, including
+      whatever its generic fallback sweep finds when a selector matches
+      nothing, so pointing this at the real page risks pulling stray
+      per-dozen prices into the index even without wiring up the real
+      selectors. Fixing this needs the venue's actual walk-in menu, if it
+      publishes one separately from its events business.
 
   # ---------------------------------------------------------------------
   # MID RANGE
@@ -221,13 +286,18 @@ restaurants:
   - id: wild_river_grille
     name: "Wild River Grille"
     category: mid_range
-    url: "https://wildrivergrille.com/menus/"
+    url: "https://www.wildrivergrille.com/dinner-menu/"
     renderer: static
-    verified: false
+    verified: true
     selectors:
-      item: ".menu-item"
-      name: ".menu-item-title"
-      price: ".menu-item-price"
+      item: "div.item"
+      name: ".name a"
+      price: ".price"
+    notes: >
+      The old /menus/ URL now 404s; the site split its single menu page into
+      /dinner-menu/, /drink-menu/ and /dessert-menu/. Verified against the
+      live dinner menu: 34 items. Only the dinner menu is tracked, since that
+      is the closest match to what the other restaurants here list.
 
   - id: louis_basque_corner
     name: "Louis' Basque Corner"
@@ -241,7 +311,10 @@ restaurants:
       price: ".menu-item-price"
     notes: >
       Basque family-style restaurant. Its set-price family dinner makes a
-      single clean series to follow over time.
+      single clean series to follow over time. Checked live: the menu is a
+      linked PDF, not HTML, so there is no page for CSS selectors to match.
+      Fixing this would mean adding PDF text extraction to the pipeline
+      rather than editing selectors here.
 
   - id: brasserie_saint_james
     name: "Brasserie Saint James"
@@ -253,36 +326,62 @@ restaurants:
       item: ".menu-item"
       name: ".menu-item-title"
       price: ".menu-item-price"
+    notes: >
+      Checked live: the site returns HTTP 403 to this scraper's identified
+      User-Agent even though its robots.txt permits fetching, which points to
+      bot detection rather than a robots rule. Per this project's rule against
+      disguising the scraper, that block is left alone rather than defeated
+      with a browser User-Agent.
 
   - id: liberty_food_wine
     name: "Liberty Food & Wine Exchange"
     category: mid_range
     url: "https://libertyfoodandwine.com/menu/"
-    renderer: static
+    renderer: javascript
     verified: false
     selectors:
       item: ".menu-item"
       name: ".menu-item-title"
       price: ".menu-item-price"
+    notes: >
+      Checked live: the menu runs on Popmenu and loads only its first
+      section on page load, with the rest behind a "Load More Content"
+      button that a plain page render never clicks. Fixing this needs the
+      browser step to click that button, which the scraper does not do
+      today. Set to javascript so the browser renderer at least loads what
+      is visible without a click.
 
   - id: campo_reno
     name: "Campo"
     category: mid_range
-    url: "https://camporeno.com/menu/"
+    url: "https://www.camporeno.com/reno-menu/"
     renderer: static
     verified: false
     selectors:
       item: ".menu-item"
       name: ".menu-item-title"
       price: ".menu-item-price"
+    notes: >
+      The old /menu/ URL is now a landing page linking to separate Reno and
+      Sparks menus; this points at the Reno food menu. Checked live: each
+      dish is its own paragraph, "<b>NAME</b> PRICE" with no wrapping
+      element around the pair and no dollar sign, and the description lives
+      in a separate sibling paragraph. There is no item container for a CSS
+      selector to select, since the "item" is really just plain text next to
+      a bold tag. This site cannot be matched by the item and name and price
+      selector model this scraper uses without a custom per-site parser.
 
   - id: pignic_pub
     name: "Pignic Pub & Patio"
     category: mid_range
     url: "https://pignicpub.com/menu/"
     renderer: static
-    verified: false
+    verified: true
     selectors:
-      item: ".menu-item"
-      name: ".menu-item-title"
-      price: ".menu-item-price"
+      item: ".pt-food-menu-item"
+      name: ".pt-food-menu-title"
+      price: ".pt-food-menu-price"
+    notes: >
+      Verified against the live page: 11 items. The page has more sections
+      than these selectors reach (drinks and specials appear to use a
+      different layout), so this is a real but partial read of the menu.
