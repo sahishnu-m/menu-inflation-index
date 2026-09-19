@@ -143,6 +143,16 @@ The dashboard only ever shows real, scraped observations. Every database
 read takes a dataset argument naming which set it wants, so a future
 addition to the storage layer cannot silently blend in anything else.
 
+Most months currently on the chart were backfilled from the Internet
+Archive's Wayback Machine rather than scraped live: for the three
+restaurants with verified selectors, past snapshots of the same menu pages
+were run through the same selectors and stored under their actual archived
+date. These are real prices from real, dated copies of the same pages, not
+estimates. The scrape log, shown in the app under *Data collection and
+ethics*, records which entries came from a live monthly run versus a
+backfilled archive snapshot, naming the snapshot's date. Going forward,
+every new month comes from the live monthly scrape.
+
 ---
 
 ## Data collection and ethics
