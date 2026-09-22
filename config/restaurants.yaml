@@ -356,20 +356,20 @@ restaurants:
     category: mid_range
     url: "https://www.camporeno.com/reno-menu/"
     renderer: static
-    verified: false
+    verified: true
     selectors:
-      item: ".menu-item"
-      name: ".menu-item-title"
-      price: ".menu-item-price"
+      item: "p:has(b)"
+      name: "b"
+      price: "::text_after_name"
     notes: >
       The old /menu/ URL is now a landing page linking to separate Reno and
-      Sparks menus; this points at the Reno food menu. Checked live: each
-      dish is its own paragraph, "<b>NAME</b> PRICE" with no wrapping
-      element around the pair and no dollar sign, and the description lives
-      in a separate sibling paragraph. There is no item container for a CSS
-      selector to select, since the "item" is really just plain text next to
-      a bold tag. This site cannot be matched by the item and name and price
-      selector model this scraper uses without a custom per-site parser.
+      Sparks menus; this points at the Reno food menu. Each dish is its own
+      paragraph, "<b>NAME</b> PRICE" with no dollar sign and no element
+      wrapping the price on its own, so the normal item/name/price selector
+      model cannot reach it. The price selector "::text_after_name" (see
+      menu_index/parser.py) reads the item block's own text and strips the
+      name off the front instead of selecting a separate element. Verified
+      against the live page.
 
   - id: pignic_pub
     name: "Pignic Pub & Patio"

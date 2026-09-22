@@ -26,6 +26,16 @@ instead. It looks for any element containing a currency-shaped number and
 reads a nearby name. It is far less reliable than a real selector, which is
 why anything it produces is marked low confidence and the item count is
 reported so the mismatch is visible.
+
+THE "::text_after_name" PRICE SELECTOR
+A few sites (Campo is the one this was written for) print an item as
+"<b>NAME</b> PRICE" with the price as bare text trailing the bold tag inside
+the same block, no dollar sign and no element of its own. There is nothing
+for a normal CSS price selector to select. Setting `price: "::text_after_name"`
+in restaurants.yaml switches to reading the item block's own text, stripping
+the name's text off the front, and reading whatever number is left. This is
+narrow on purpose: it only ever reads the same block the name came from, so
+it cannot misattribute a price the way scanning the whole page could.
 """
 
 from __future__ import annotations
@@ -49,6 +59,12 @@ PRICE_TEXT = re.compile(r"\$\s*\d{1,3}(?:\.\d{2})?")
 NON_ITEM_TEXT = re.compile(
     r"^(gift card|delivery|tip|tax|subtotal|total|minimum|fee)\b", re.IGNORECASE
 )
+
+# The sentinel that switches a restaurant's price selector to reading the
+# trailing text of its own item block instead of a child element. See the
+# module docstring.
+TEXT_AFTER_NAME = "::text_after_name"
+TRAILING_NUMBER = re.compile(r"(\d+(?:\.\d{1,2})?)\s*$")
 
 
 @dataclass
@@ -99,18 +115,36 @@ def _parse_with_selectors(restaurant: Restaurant, blocks) -> list[ParsedItem]:
 
     for block in blocks:
         name_element = block.select_one(restaurant.selectors.name)
-        price_element = block.select_one(restaurant.selectors.price)
-        if not name_element or not price_element:
+        if not name_element:
+            continue
+        name_text = name_element.get_text(" ", strip=True)
+
+        if restaurant.selectors.price == TEXT_AFTER_NAME:
+            price_text = _price_after_name(block, name_text)
+        else:
+            price_element = block.select_one(restaurant.selectors.price)
+            price_text = price_element.get_text(" ", strip=True) if price_element else None
+        if price_text is None:
             continue
 
-        item = _build_item(
-            name_element.get_text(" ", strip=True),
-            price_element.get_text(" ", strip=True),
-        )
+        item = _build_item(name_text, price_text)
         if item:
             items.append(item)
 
     return _deduplicate(items)
+
+
+def _price_after_name(block, name_text: str) -> str | None:
+    """
+    Read the price left over once the name is stripped from an item block's
+    own text. Used only when the price selector is TEXT_AFTER_NAME.
+    """
+    full_text = block.get_text(" ", strip=True)
+    remainder = full_text
+    if name_text and full_text.startswith(name_text):
+        remainder = full_text[len(name_text):]
+    match = TRAILING_NUMBER.search(remainder)
+    return match.group(1) if match else None
 
 
 def _parse_generic(soup: BeautifulSoup) -> list[ParsedItem]:
